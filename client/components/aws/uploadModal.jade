@@ -1,0 +1,18 @@
+.modal-header
+  button.close(ng-if='modal.dismissable', type='button', ng-click='$dismiss()') &times;
+  h4.modal-title(ng-if='modal.title', ng-bind='modal.title')
+
+.modal-body
+  p(ng-if='modal.text', ng-bind='modal.text')
+  div(ng-if='modal.html', ng-bind-html='modal.html')
+  div.form-group
+    label(for="fileInput") Input File(s)...
+    input.btn(id="fileInput", type="file", ngf-select="onFileSelect($files)", multiple)
+    //- p.help-block Select pictures
+    div(ng-repeat="file in files")
+      .progress
+        .progress-bar(role="progressbar", style="width:{{file.progress}}%;")
+          | {{file.name}} : {{file.progress}}
+      button.btn.btn-ttc(type="button", ng-click="abort($index)", ng-show="file.progress != 100") Abort
+.modal-footer
+  button.btn(ng-repeat='button in modal.buttons', ng-class='button.classes', ng-click='button.click($event)', ng-bind='button.text')

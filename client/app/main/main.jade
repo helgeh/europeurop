@@ -1,0 +1,32 @@
+div(ng-include='"components/navbar/navbar.html"')
+
+header#banner.hero-unit
+  .container
+    h1 Insert secret code
+    p.lead ...and recieve downloads
+    form.input-group.input-group-lg(name='urlForm')
+      input.form-control(type='text', placeholder='secret', ng-model='secretInput', required)
+      span.input-group-btn
+        button.btn.btn-default(ng-click='validate(secretInput)') GO!
+    p.download-icons
+      span.fa-stack.fa-3x
+        i.fa.fa-stack-2x.fa-circle
+        i.fa.fa-stack-1x.fa-unlock-alt.fa-inverse
+      span.fa-stack.fa-3x 
+        i.fa.fa-stack-1x.fa-caret-right
+      span.fa-stack.fa-3x
+        i.fa.fa-stack-2x.fa-circle
+        i.fa.fa-stack-1x.fa-envelope-o.fa-inverse
+      span.fa-stack.fa-3x
+        i.fa.fa-stack-1x.fa-caret-right
+      span.fa-stack.fa-3x
+        i.fa.fa-stack-2x.fa-circle
+        i.fa.fa-stack-1x.fa-download.fa-inverse
+
+footer.footer
+  .container
+    p
+      | 
+      a(href='https://europeurop.com/') Europeurop
+      = ' | '
+      year

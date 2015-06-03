@@ -1,0 +1,5 @@
+.navbar.navbar-default.devmenu.navbar-fixed-bottom(ng-controller='DevCtrl' ng-show='isDev')
+  .container
+    ul.nav.navbar-nav
+      li(ng-repeat='item in dev.menu', ng-class='{active: isActive(item.link)}')
+        a(href='{{ item.link }}') {{ item.label }}
