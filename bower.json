@@ -15,7 +15,7 @@
     "font-awesome": ">=4.1.0",
     "lodash": "~2.4.1",
     "noty": "~2.3.5",
-    "ng-file-upload": "~4.2.1",
+    "ng-file-upload": "^5.0.0",
     "xml2json": "~1.1.1"
   },
   "devDependencies": {
