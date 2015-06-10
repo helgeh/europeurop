@@ -72,8 +72,10 @@ angular.module('europeuropApp')
 
         uploadModal = openModal({
           onFileSelect: function ($files) {
-            // if (!$files)
-            //   return;
+            // TODO: don't know why this gets called before files select window is even opened.
+            // Fix ugly workaround later
+            if (!$files)
+              return;
             modalScope.files = $files;
             var uploads = [],
               directory = currentCampaign.slug;
