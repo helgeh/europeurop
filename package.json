@@ -23,7 +23,8 @@
     "passport": "~0.2.0",
     "passport-google-oauth": "latest",
     "passport-local": "~0.1.6",
-    "serve-favicon": "~2.0.1"
+    "serve-favicon": "~2.0.1",
+    "slug": "^0.9.1"
   },
   "devDependencies": {
     "grunt": "~0.4.4",
