@@ -2,6 +2,8 @@
 
 var _ = require('lodash');
 var Purchase = require('./purchase.model');
+var Campaign = require('../campaign/campaign.model');
+var User = require('../user/user.model');
 
 // Get list of purchases
 exports.index = function(req, res) {
@@ -26,11 +28,11 @@ exports.create = function(req, res) {
   //   if(err) { return handleError(res, err); }
   //   return res.json(201, purchase);
   // });
-  Campaign.findById(query.campaign_id, function (err, campaign) {
+  Campaign.findById(req.query.campaign_id, function (err, campaign) {
     if (err) return handleError(res, err);
-    User.findById(query.user_id, function (err, user) {
+    User.findById(req.query.user_id, function (err, user) {
       if (err) return handleError(res, err);
-      Purchase.create(query, function (err, data) {
+      Purchase.create(req.query, function (err, data) {
         if (err) return handleError(res, err);
         console.log("   SKREV NY PURCHASE!!!!!!!!!!!!!!!!!!!!!!!!");
         return res.json(201, data);

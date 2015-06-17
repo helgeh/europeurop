@@ -6,9 +6,10 @@ angular.module('europeuropApp', [
   'ngSanitize',
   'ngRoute',
   'ui.bootstrap',
-  'ngFileUpload'
+  'ngFileUpload',
+  'grecaptcha'
 ])
-  .config(function ($routeProvider, $locationProvider, $httpProvider) {
+  .config(function ($routeProvider, $locationProvider, $httpProvider, grecaptchaProvider) {
     $routeProvider
       .otherwise({
         redirectTo: '/'
@@ -16,6 +17,10 @@ angular.module('europeuropApp', [
 
     $locationProvider.html5Mode(true);
     $httpProvider.interceptors.push('authInterceptor');
+    grecaptchaProvider.setParameters({
+      sitekey: '6LeySwgTAAAAAEnT9nG-9vgUYXHGdM13yHJcuDoE',
+      theme: 'dark'
+    });
   })
 
   .factory('authInterceptor', function ($rootScope, $q, $cookieStore, $location) {

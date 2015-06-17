@@ -29,10 +29,16 @@ angular.module('europeuropApp')
       })
     }
 
+    $scope.submit = function() {
+      console.log("submit : ", $scope.captcha);
+      if ($scope.captcha && $scope.captcha !== '')
+        validate($scope.secretInput);
+    };
+
     // check if a code is valid
-    $scope.validate = function (code) {
+    function validate (code) {
       console.log("validating " + code);
-      $http.get('/api/campaigns/validate/' + code).then(function (response) {
+      $http.post('/api/campaigns/validate/' + code, {captcha: $scope.captcha}).then(function (response) {
         console.log(response);
         if (response.isValid) {
           User.setCode(response.code);
