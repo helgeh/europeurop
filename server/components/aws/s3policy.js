@@ -53,7 +53,7 @@ function s3instance(accessKey, secretKey) {
                 ["starts-with","$Content-Type",""]
             ]
         };
-console.log('key: ' + key);
+
         var policyString = JSON.stringify(policy);
         var policyBase64 = new Buffer(policyString).toString('base64');
         var signature = crypto.createHmac("sha1", this.secretKey).update(policyBase64);
