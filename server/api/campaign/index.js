@@ -12,7 +12,7 @@ router.use('/:campaign_id/codes', require('../code'));
 
 
 /// TODO prevent brute-force
-router.use('/validate/:code', codeController.validate);
+router.post('/validate/:code', codeController.validate);
 
 router.get('/', auth.hasRole('admin'), controller.index);
 router.get('/:id', auth.hasRole('admin'), controller.show);

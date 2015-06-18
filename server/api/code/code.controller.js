@@ -5,6 +5,7 @@ var cc = require('coupon-code');
 var rndstrings = require('../../components/utils/random-strings');
 var Code = require('./code.model');
 var Campaign = require('../campaign/campaign.model');
+var request = require('request');
 
 // Get list of codes
 exports.index = function(req, res) {
@@ -32,20 +33,37 @@ exports.generate = function (req, res) {
 };
 
 exports.validate = function (req, res) {
-  var motor = req.query.motor;
-  var input = cc.validate(req.params.code);
-  if (input.length < 1)
-    return handleError(res, {message: 'Not valid'});
-  Code
-    .findOne({value: input})
-    .exec(function (err, code) {
-      if (err) return handleError(res, err);
-      if (!code) return res.json(200, 'Not found');
-      var isValid = !!(input == code.value);
-      res.json(200, {isValid: isValid, code: code});
-    });
-  // res.json(200, {isValid: cc.validate(req.query.code).length > 0});
-}
+  var verifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
+  var captcha = req.body.captcha;
+  var postData = {
+    secret: '6LeySwgTAAAAAJMaA9aAKNbc3LSUAUtdyocTZ3d6',
+    response: captcha
+  };
+  request.post({url: verifyUrl, form: postData}, function (err, httpResponse, body) {
+    var response = JSON.parse(body);
+    if (response.success) {
+      var input = req.params.code;
+      var motor = req.query.motor;
+      // if (motor === undefined || motor == 'coupon-codes')
+        input = cc.validate(input);
+      if (input.length < 1)
+        return handleError(res, {message: 'Not valid code'});
+      else {
+        Code
+          .findOne({value: input})
+          .exec(function (err, code) {
+            if (err) return handleError(res, err);
+            if (!code) return res.json(200, 'Not found');
+            var isValid = !!(input == code.value);
+            res.json(200, {isValid: isValid, code: code});
+          });
+      }
+    }
+    else {
+      return handleError(res, {message: 'Not valid inputs'});
+    }
+  });
+};
 
 // Get a single code
 exports.show = function(req, res) {
@@ -112,5 +130,6 @@ exports.destroy = function(req, res) {
 };
 
 function handleError(res, err) {
+  console.log("handleError... ", err);
   return res.send(500, err);
 }
