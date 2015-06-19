@@ -11,7 +11,7 @@ var request = require('request');
 
 // Get list of codes
 exports.index = function(req, res) {
-  Code.find({campaign: req.params.campaign_id}, function (err, codes) {
+  Code.find({campaign: req.params.campaign_id}, '-s3Object', function (err, codes) {
     if(err) { return handleError(res, err); }
     return res.json(200, codes);
   });
@@ -58,13 +58,10 @@ exports.validate = function (req, res) {
           .populate('campaign')
           .exec(function (err, code) {
             if (err) return handleError(res, err);
-            if (!code) return res.json(200, 'Not found');
+            if (!code || !code.active) return res.json(200, 'Not found');
             var isValid = !!(input == code.value);
             if (isValid) {
               var p = new Purchase();
-              // var u = new User();
-              // u.save();
-              // p.user_id = u._id;
               p.code_id = code._id;
               p.campaign_id = code.campaign_id;
               p.save();
@@ -104,6 +101,7 @@ exports.create = function(req, res) {
     function onInsert(err, codes) {
       if(err) return handleError(res, err);
       codes.forEach(function (code) {
+        code.active = true;
         campaign.codes.push(code._id);
       });
       campaign.save(function (err, campaign) {

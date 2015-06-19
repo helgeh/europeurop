@@ -24,18 +24,16 @@ exports.show = function(req, res) {
 
 // Creates a new purchase in the DB.
 exports.create = function(req, res) {
-  // Purchase.create(req.body, function(err, purchase) {
-  //   if(err) { return handleError(res, err); }
-  //   return res.json(201, purchase);
-  // });
+  var requiredMsg = 'Prerequisite not found. Cannot create purchase without campaign and user set.';
   Campaign.findById(req.query.campaign_id, function (err, campaign) {
     if (err) return handleError(res, err);
+    if (!campaign) return handleError(res, requiredMsg);
     User.findById(req.query.user_id, function (err, user) {
       if (err) return handleError(res, err);
-      Purchase.create(req.query, function (err, data) {
+      if (!user) return handleError(res, requiredMsg);
+      Purchase.create(req.query, function (err, purchase) {
         if (err) return handleError(res, err);
-        console.log("   SKREV NY PURCHASE!!!!!!!!!!!!!!!!!!!!!!!!");
-        return res.json(201, data);
+        return res.json(201, purchase);
       })
     });
   });

@@ -38,7 +38,7 @@ exports.create = function (req, res, next) {
     if (err) return validationError(res, err);
     if (p_id) {
       console.log("p_id exists and we should update id " + p_id);
-      Purchase.findOneAndUpdate({id: p_id}, {user_id: user._id}, function (err, purchase) {
+      Purchase.findOneAndUpdate({_id: p_id}, {user_id: user._id}, function (err, purchase) {
         if (err) response.error = {message: 'Could not connect purchase to new user.'};
         console.log(purchase);
       });

@@ -2,7 +2,7 @@
 
 angular.module('europeuropApp')
   .controller('AdminCtrl', function ($scope, $http, Auth, Campaigns, Codes, Things, User, UploadModal, Notify) {
-    
+
 
     /*----------------------------*/
     /*   GENERAL                  */
@@ -33,7 +33,8 @@ angular.module('europeuropApp')
     function initEdit(campaign) {
       isEditing = true;
       isCreating = false;
-      $scope.editedCampaign = angular.copy(campaign);
+      // $scope.editedCampaign = angular.copy(campaign);
+      $scope.editedCampaign = Campaigns.get({_id: campaign._id});
       Codes.query({campaign_id: campaign._id}, function (response) {
         $scope.editedCodes = response;
       });

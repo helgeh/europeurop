@@ -6,7 +6,8 @@ var mongoose = require('mongoose'),
 var CodeSchema = new Schema({
   value: String,
   info: String,
-  campaign: { type: Schema.Types.ObjectId, ref: 'Campaign' }
+  campaign: { type: Schema.Types.ObjectId, ref: 'Campaign' },
+  active: Boolean
 });
 
 CodeSchema.set('autoIndex', false);
