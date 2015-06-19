@@ -5,15 +5,24 @@ angular.module('europeuropApp')
     $scope.user = {};
     $scope.errors = {};
 
+    function hasPurchase () {
+      return Auth.hasPurchase();
+    }
+    $scope.hasPurchase = hasPurchase;
+
     $scope.register = function(form) {
       $scope.submitted = true;
 
-      if(form.$valid) {
-        Auth.createUser({
+      var values = {
           name: $scope.user.name,
           email: $scope.user.email,
           password: $scope.user.password
-        })
+        };
+      if (hasPurchase())
+        values.purchase_id = Auth.getPurchase()._id;
+
+      if(form.$valid) {
+        Auth.createUser(values)
         .then( function() {
           // Account created, redirect to home
           $location.path('/');

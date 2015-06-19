@@ -1,6 +1,7 @@
 'use strict';
 
 var User = require('./user.model');
+var Purchase = require('../purchase/purchase.model');
 var passport = require('passport');
 var config = require('../../config/environment');
 var jwt = require('jsonwebtoken');
@@ -24,13 +25,27 @@ exports.index = function(req, res) {
  * Creates a new user
  */
 exports.create = function (req, res, next) {
+  console.log(req.body);
+  if (req.body.purchase_id) {
+    var p_id = req.body.purchase_id;
+    delete(req.body.purchase_id);
+  }
   var newUser = new User(req.body);
+  var response = {};
   newUser.provider = 'local';
   newUser.role = 'user';
   newUser.save(function(err, user) {
     if (err) return validationError(res, err);
+    if (p_id) {
+      console.log("p_id exists and we should update id " + p_id);
+      Purchase.findOneAndUpdate({id: p_id}, {user_id: user._id}, function (err, purchase) {
+        if (err) response.error = {message: 'Could not connect purchase to new user.'};
+        console.log(purchase);
+      });
+    }
     var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
-    res.json({ token: token });
+    response.token = token;
+    res.json(response);
   });
 };
 
@@ -89,7 +104,19 @@ exports.me = function(req, res, next) {
   }, '-salt -hashedPassword', function(err, user) { // don't ever give out the password or salt
     if (err) return next(err);
     if (!user) return res.json(401);
-    res.json(user);
+    Purchase.find({user_id: user._id}, function (err, purchases) {
+      if (err) {
+        // do something else
+      }
+      else if (purchases.length < 1) {
+      }
+      else {
+        console.log('FOUND PURCHASE!');
+        console.log(purchases);
+        user.purchases = purchases;
+      }
+      res.json(user);
+    });
   });
 };
 

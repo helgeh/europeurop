@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('europeuropApp')
-  .controller('MainCtrl', function ($scope, $http, $location, User) {
+  .controller('MainCtrl', function ($scope, $http, $location, Auth, grecaptcha, Notify) {
     $scope.awesomeThings = [];
 
     $scope.addThing = function() {
@@ -30,7 +30,6 @@ angular.module('europeuropApp')
     }
 
     $scope.submit = function() {
-      console.log("submit : ", $scope.captcha);
       if ($scope.captcha && $scope.captcha !== '')
         validate($scope.secretInput);
     };
@@ -39,10 +38,17 @@ angular.module('europeuropApp')
     function validate (code) {
       console.log("validating " + code);
       $http.post('/api/campaigns/validate/' + code, {captcha: $scope.captcha}).then(function (response) {
-        console.log(response);
-        if (response.isValid) {
-          User.setCode(response.code);
+        if (response.data.isValid) {
+          Auth.setPurchase(response.data.purchase);
+          $location.path('/signup');
         }
+        else if (response.data.captcha) {
+          Notify.error({text: 'Looks like you\'re a robot!'}); // captcha not valid
+        }
+        else {
+          Notify.error({text: 'We could not find your code. Sure you typed it right?'});
+        }
+        grecaptcha.reset();
       });
     };
 

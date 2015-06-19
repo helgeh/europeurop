@@ -3,7 +3,7 @@
 angular.module('europeuropApp')
   .factory('Auth', function Auth($location, $rootScope, $http, User, $cookieStore, $q) {
     var currentUser = {};
-    var currentCode = {};
+    var currentPurchase = {};
     if($cookieStore.get('token')) {
       currentUser = User.get();
     }
@@ -145,17 +145,24 @@ angular.module('europeuropApp')
       },
 
       /**
-       * Get redeemed code
+       * Check if user has a new purchase
        */
-      getCode: function () {
-        return currentCode;
+      hasPurchase: function () {
+        return currentPurchase.hasOwnProperty('_id');
       },
 
       /**
-       * Set redeemed code for later 
+       * Get Purchase
        */
-      setCode: function (code) {
-        currentCode = code;
+      getPurchase: function () {
+        return currentPurchase;
+      },
+
+      /**
+       * Set Purchase
+       */
+      setPurchase: function (purchase) {
+        currentPurchase = purchase;
       }
     };
   });
