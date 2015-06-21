@@ -18,3 +18,11 @@ describe('GET /api/purchases', function() {
       });
   });
 });
+
+// describe('PUT /api/purchases/:id', function() {
+//   it('should lock after updated with user_id', function(done) {
+//     request(app)
+//       .put('/api/purchases/:id')
+//       .expect(201)
+//   })
+// });

@@ -41,14 +41,19 @@ exports.create = function(req, res) {
 
 // Updates an existing purchase in the DB.
 exports.update = function(req, res) {
-  if(req.body._id) { delete req.body._id; }
+  if (!req.user || !req.user.role)
+    return res.send(401);
   Purchase.findById(req.params.id, function (err, purchase) {
-    if (err) { return handleError(res, err); }
-    if(!purchase) { return res.send(404); }
+    if(err) return handleError(res, err);
+    if(!purchase) return res.send(404);
+    if(purchase.active) return res.send(401);// <-- when purchase has been saved with user_id it should never be updated again
+    if(req.user._id !== req.body.user_id) return res.send(400);
+    if(req.body._id) delete req.body._id;
+    req.body.active = true;
     var updated = _.merge(purchase, req.body);
     updated.save(function (err) {
       if (err) { return handleError(res, err); }
-      return res.json(200, purchase);
+      return res.json(200, updated);
     });
   });
 };

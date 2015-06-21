@@ -49,7 +49,8 @@ angular.module('europeuropApp', [
     };
   })
 
-  .run(function ($rootScope, $location, $http, Auth) {
+  .run(function ($rootScope, $location, $http, Auth, Notify) {
+    window.Notify = Notify;
     // Redirect to login if route requires auth and you're not logged in
     $rootScope.$on('$routeChangeStart', function (event, next) {
       var path = $location.path();

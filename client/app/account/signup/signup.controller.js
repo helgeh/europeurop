@@ -25,6 +25,8 @@ angular.module('europeuropApp')
         Auth.createUser(values)
         .then( function() {
           // Account created, redirect to home
+          if (hasPurchase())
+            Auth.savePurchase();
           $location.path('/');
         })
         .catch( function(err) {

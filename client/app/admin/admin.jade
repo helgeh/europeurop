@@ -56,11 +56,14 @@ div(ng-include='"components/navbar/navbar.html"')
       //    ***********************************
       
       div(ng-show='shouldShowEditForm()')
-        h2 Editing {{ editedCampaign.slug }}
+        h2 Editing {{ editedCampaign.title }}
         form.form(name='editForm', ng-submit='updateCampaign(editedCampaign)', novalidate='')
           .form-group
             label Title
             input.form-control(type='text', name='title', ng-model='editedCampaign.title', required)
+          .form-group
+            //- btn-checkbox-true="1" btn-checkbox-false="0")
+            a.btn.btn-default(btn-checkbox, ng-model='editedCampaign.active') {{ editedCampaign.active ? 'Active' : 'Inactive' }}
           .form-group
             h3 Codes
             //- div.input-group
@@ -74,21 +77,24 @@ div(ng-include='"components/navbar/navbar.html"')
             //-     option(ng-repeat='code in newCodes', value='{{ code }}' ng-selected='$first') {{ code }}
             //- a.btn.btn-inverse.btn-xs(ng-show='newCodes.length', ng-click='addMoreCodes(newCodes)') 
             //-   | OK?
-            ul.list-group(ng-show='editedCodes.length')
+            a.btn.btn-xs(ng-click='codesCollapsed = !codesCollapsed') {{ codesCollapsed ? 'Show' : 'Hide' }}
+            ul.list-group(ng-show='editedCodes.length', collapse='codesCollapsed')
               li.list-group-item(ng-repeat='code in editedCodes')
                 | {{ code.value }}
+                span {{ code.redeemed ? '' : 'Redeemed!' }}
           .form-group
             h3 Downloadables
               p
                 a.btn.btn-default(ng-click="addFiles(editedCampaign)") Add files
-              ul.list-group
+              a.btn.btn-xs(ng-click='thingsCollapsed = !thingsCollapsed') {{ thingsCollapsed ? 'Show' : 'Hide' }}
+              ul.list-group(collapse='thingsCollapsed')
                 li.list-group-item(ng-repeat='thing in editedThings')
                   | {{ thing.name }}
                   = ' '
-                  a(ng-click='openFile(thing)') 
+                  a(ng-href='#', ng-click='openFile(editedCampaign, thing)') 
                     | open
                   = ' '
-                  a(ng-click='downloadFile(thing)') 
+                  a(ng-href='#', ng-click='downloadFile(editedCampaign, thing)') 
                     | dl 
           .form-group.has-error
             p.help-block(ng-show='editForm.title.$error.required && editForm.codes.$error.required && editForm.$submitted')
@@ -97,10 +103,11 @@ div(ng-include='"components/navbar/navbar.html"')
               | Only integers are allowed
             p.help-block {{ errors.other }}
           div
-            button.btn.btn-inverse.btn-lg.btn-login(type='submit')
-              | Update
+            button.btn.btn-inverse.btn-lg.btn-login(type='submit') Update
             = ' '
             button.btn.btn-default.btn-lg(type='reset', ng-click='abortEdit()') Cancel
+            = ' '
+            button.btn.btn-default.btn-lg(type='reset', ng-click='deleteCampaign(editedCampaign)') Delete
 
       hr
 

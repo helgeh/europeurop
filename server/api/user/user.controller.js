@@ -37,16 +37,20 @@ exports.create = function (req, res, next) {
   newUser.save(function(err, user) {
     if (err) return validationError(res, err);
     if (p_id) {
-      console.log("p_id exists and we should update id " + p_id);
       Purchase.findOneAndUpdate({_id: p_id}, {user_id: user._id}, function (err, purchase) {
-        if (err) response.error = {message: 'Could not connect purchase to new user.'};
-        console.log(purchase);
+        if(err) return res.send(500, err);
+        signToken(user);
       });
     }
+    else {
+      signToken(user);
+    }
+  });
+  function signToken(user) {
     var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
     response.token = token;
     res.json(response);
-  });
+  }
 };
 
 /**
@@ -59,6 +63,27 @@ exports.show = function (req, res, next) {
     if (err) return next(err);
     if (!user) return res.send(401);
     res.json(user.profile);
+  });
+};
+
+/**
+ * Get list of purchases owned by user
+ */
+exports.getPurchases = function(req, res) {
+  var userId = req.user._id, query;
+  if (req.user.role === 'admin') {
+    query = Purchase.find();
+    query.populate('campaign');
+  }
+  else {
+    query = Purchase.find({user_id: userId});
+    query.populate('campaign', '-codes');// <-- don't show codes to anyone other than admins
+  }
+  query.exec(function (err, purchases) {
+    if(err) return res.send(500, err);
+    console.log(purchases);
+    if (!purchases || purchases.length < 1) return res.send(404);
+    res.json(200, purchases);
   });
 };
 
@@ -98,27 +123,24 @@ exports.changePassword = function(req, res, next) {
  * Get my info
  */
 exports.me = function(req, res, next) {
-  var userId = req.user._id;
-  User.findOne({
-    _id: userId
-  }, '-salt -hashedPassword', function(err, user) { // don't ever give out the password or salt
+  var userId = req.user._id, query;
+  query = User.findOne({_id: userId});
+  query.select('-salt -hashedPassword'); // don't ever give out the password or salt
+  query.exec(function(err, user) { 
     if (err) return next(err);
     if (!user) return res.json(401);
     Purchase.find({user_id: user._id}, function (err, purchases) {
-      if (err) {
-        // do something else
-      }
-      else if (purchases.length < 1) {
-      }
-      else {
-        console.log('FOUND PURCHASE!');
-        console.log(purchases);
+      if (purchases && purchases.length > 0) {
         user.purchases = purchases;
       }
       res.json(user);
     });
   });
 };
+
+// exports.validateEmail = function(req, res, next) {
+  
+// }
 
 /**
  * Authentication callback

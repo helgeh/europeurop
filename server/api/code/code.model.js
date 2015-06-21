@@ -7,6 +7,7 @@ var CodeSchema = new Schema({
   value: String,
   info: String,
   campaign: { type: Schema.Types.ObjectId, ref: 'Campaign' },
+  redeemed: Boolean,
   active: Boolean
 });
 

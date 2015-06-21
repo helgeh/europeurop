@@ -3,6 +3,7 @@ div(ng-include='"components/navbar/navbar.html"')
   .row
     .col-sm-12
       h1 Login
+        small(ng-show='hasPurchase()') ...to get yer downloads
 
     .col-sm-12
       form.form(name='form', ng-submit='login(form)', novalidate='')

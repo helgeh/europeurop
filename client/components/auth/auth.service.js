@@ -1,11 +1,15 @@
 'use strict';
 
 angular.module('europeuropApp')
-  .factory('Auth', function Auth($location, $rootScope, $http, User, $cookieStore, $q) {
+  .factory('Auth', function Auth($location, $rootScope, $http, $cookieStore, $q, User) {
     var currentUser = {};
     var currentPurchase = {};
     if($cookieStore.get('token')) {
-      currentUser = User.get();
+      currentUser = User.get(function () {
+        currentUser.purchases = User.getPurchases({ id: currentUser._id }); //, function (result) {
+        //   currentUser.purchases = result;
+        // });
+      });
     }
 
     return {
@@ -148,7 +152,7 @@ angular.module('europeuropApp')
        * Check if user has a new purchase
        */
       hasPurchase: function () {
-        return currentPurchase.hasOwnProperty('_id');
+        return currentPurchase.hasOwnProperty('_id') || currentUser.purchases;
       },
 
       /**
@@ -163,6 +167,36 @@ angular.module('europeuropApp')
        */
       setPurchase: function (purchase) {
         currentPurchase = purchase;
+      },
+
+      /**
+       * If user is logged in save current purchase to current user
+       */
+      savePurchase: function () {
+        if (!purchase) {
+          Notify.error({text: 'No purchase to save!'});
+        }
+        else if (!this.isLoggedIn()) {
+          Notify.error({text: 'Not logged in!'});
+        }
+        else if (purchase.user_id) {
+          Notify.error({text: 'Purchase allready saved!'});
+        }
+        else {
+          purchase.user_id = currentUser._id;
+          $http.put('/api/purchases/' + purchase._id, purchase).success(function (data) {
+            Notify.success({text: 'Purchase added to your account!'});
+          }).error(function (data) {
+            Notify.error({text: 'Even if you are logged in we could not add the purchase to your account. Please contact administrators!'});
+          });
+        }
+      },
+
+      /**
+       * Get All Purchases
+       */
+      getAllPurchases: function () {
+        return currentUser.purchases;
       }
     };
   });

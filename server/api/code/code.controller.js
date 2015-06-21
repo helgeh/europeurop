@@ -7,7 +7,6 @@ var Code = require('./code.model');
 var Purchase = require('../purchase/purchase.model');
 var Campaign = require('../campaign/campaign.model');
 var User = require('../user/user.model');
-var request = require('request');
 
 // Get list of codes
 exports.index = function(req, res) {
@@ -35,42 +34,37 @@ exports.generate = function (req, res) {
 };
 
 exports.validate = function (req, res) {
-  var verifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
-  var captcha = req.body.captcha;
-  var postData = {
-    secret: '6LeySwgTAAAAAJMaA9aAKNbc3LSUAUtdyocTZ3d6',
-    response: captcha
-  };
-  request.post({url: verifyUrl, form: postData}, function (err, httpResponse, body) {
-    var response = JSON.parse(body);
-    if (!response.success)
-      return res.json(200, {message: 'Not valid inputs', captcha: true});
-    if (response.success) {
-      var input = req.params.code;
-      var motor = req.query.motor;
-      // if (motor === undefined || motor == 'coupon-codes')
-        input = cc.validate(input);
-      if (input.length < 1)
-        return res.json(200, {message: 'Not valid code'});
-      else {
-        Code
-          .findOne({value: input})
-          .populate('campaign')
-          .exec(function (err, code) {
-            if (err) return handleError(res, err);
-            if (!code || !code.active) return res.json(200, 'Not found');
-            var isValid = !!(input == code.value);
-            if (isValid) {
-              var p = new Purchase();
-              p.code_id = code._id;
-              p.campaign_id = code.campaign_id;
-              p.save();
-              res.json(200, {isValid: isValid, purchase: p});
-            }
-          });
-      }
-    }
-  });
+  var input = req.params.code;
+  var motor = req.query.motor;
+  console.log(req.params);
+  // if (motor === undefined || motor == 'coupon-codes')
+    input = cc.validate(input);
+  if (input.length < 1)
+    return res.json(200, {message: 'Not valid code'});
+  else {
+    var query = Code.findOne({value: input});
+    if (req.user && req.user.role === 'admin')
+      query.populate('campaign')
+    else
+      query.populate('campaign', '-codes');
+    query.exec(function (err, code) {
+      if (err) return handleError(res, err);
+      if (!code || !code.active) return res.json(200, {message: 'Not found'});
+      var p = new Purchase({active: false});
+      p.code_id = code._id;
+      p.campaign = code.campaign;
+      console.log('user: ', req.user);
+      if (req.user)
+        p.user_id = req.user._id;
+      p.save(function (err, p) {
+        if (err) return handleError(res, err);
+        code.redeemed = true;
+        code.save(function (err) {
+          res.json(200, {isValid: true, purchase: p});
+        })
+      });
+    });
+  }
 };
 
 // Get a single code
