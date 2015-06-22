@@ -49,7 +49,7 @@ exports.validate = function (req, res) {
       query.populate('campaign', '-codes');
     query.exec(function (err, code) {
       if (err) return handleError(res, err);
-      if (!code || !code.active) return res.json(200, {message: 'Not found'});
+      if (!code/* || !code.active*/) return res.json(200, {message: 'Not found'});
       var p = new Purchase({active: false});
       p.code_id = code._id;
       p.campaign = code.campaign;

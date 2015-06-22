@@ -37,7 +37,8 @@ exports.create = function (req, res, next) {
   newUser.save(function(err, user) {
     if (err) return validationError(res, err);
     if (p_id) {
-      Purchase.findOneAndUpdate({_id: p_id}, {user_id: user._id}, function (err, purchase) {
+      // TODO: Make better security checks, e.g. is not active + +
+      Purchase.findOneAndUpdate({_id: p_id}, {user_id: user._id, active: true}, function (err, purchase) {
         if(err) return res.send(500, err);
         signToken(user);
       });
@@ -81,7 +82,7 @@ exports.getPurchases = function(req, res) {
   }
   query.exec(function (err, purchases) {
     if(err) return res.send(500, err);
-    console.log(purchases);
+    // console.log(purchases);
     if (!purchases || purchases.length < 1) return res.send(404);
     res.json(200, purchases);
   });

@@ -1,16 +1,21 @@
 'user strict';
 
 angular.module('europeuropApp')
-  .directive('purchase', ['$http', '$window', 'Thing', function ($http, $window, Thing, Modal) {
+  .directive('purchase', ['$http', '$window', 'Thing', 'Modal', function ($http, $window, Thing, Modal) {
     return {
-      restrict: 'A',
-      scope: '=',
+      restrict: 'EA',
+      templateUrl: 'app/main/purchase.html',
+      scope: {
+        campaign: '='
+      },
       link: function (scope, el, at) {
-        var campaign = scope.purchase.campaign || {};
+        var campaign = scope.campaign || {};
         var showImage = Modal.show.image();
+        scope.things = [];
 
-        if (campaign._id)
+        if (campaign._id) {
           scope.things = Thing.query({campaign_id: campaign._id || '0'});
+        }
 
         function openFile (thing) {
           Thing.download({campaign_id: campaign._id, thing_id: thing._id}, function (data) {

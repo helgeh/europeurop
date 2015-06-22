@@ -4,6 +4,7 @@ angular.module('europeuropApp')
   .controller('MainCtrl', function ($scope, $http, $location, Auth, Thing, grecaptcha) {
 
     $scope.user = Auth.getCurrentUser();
+    $scope.formExpanded = true;
 
 
     /**
@@ -23,7 +24,7 @@ angular.module('europeuropApp')
     $scope.hasPurchases = hasPurchases;
 
     function showRedeemForm() {
-      return !(Auth.getCurrentUser() && Auth.getCurrentUser().purchases);
+      return !!(!hasPurchases() || $scope.formExpanded);
     }
     $scope.showRedeemForm = showRedeemForm;
 

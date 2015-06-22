@@ -173,18 +173,20 @@ angular.module('europeuropApp')
        * If user is logged in save current purchase to current user
        */
       savePurchase: function () {
-        if (!purchase) {
+        console.log("When coming from singup, user is not logged in when calling savePurchase()");
+        console.log(currentUser);
+        if (!currentPurchase) {
           Notify.error({text: 'No purchase to save!'});
         }
         else if (!this.isLoggedIn()) {
           Notify.error({text: 'Not logged in!'});
         }
-        else if (purchase.user_id) {
+        else if (currentPurchase.user_id) {
           Notify.error({text: 'Purchase allready saved!'});
         }
         else {
-          purchase.user_id = currentUser._id;
-          $http.put('/api/purchases/' + purchase._id, purchase).success(function (data) {
+          currentPurchase.user_id = currentUser._id;
+          $http.put('/api/purchases/' + currentPurchase._id, currentPurchase).success(function (data) {
             Notify.success({text: 'Purchase added to your account!'});
           }).error(function (data) {
             Notify.error({text: 'Even if you are logged in we could not add the purchase to your account. Please contact administrators!'});
