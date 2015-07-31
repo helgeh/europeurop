@@ -24,19 +24,20 @@ exports.show = function(req, res) {
 
 // Creates a new purchase in the DB.
 exports.create = function(req, res) {
-  var requiredMsg = 'Prerequisite not found. Cannot create purchase without campaign and user set.';
-  Campaign.findById(req.query.campaign_id, function (err, campaign) {
-    if (err) return handleError(res, err);
-    if (!campaign) return handleError(res, requiredMsg);
-    User.findById(req.query.user_id, function (err, user) {
-      if (err) return handleError(res, err);
-      if (!user) return handleError(res, requiredMsg);
-      Purchase.create(req.query, function (err, purchase) {
-        if (err) return handleError(res, err);
-        return res.json(201, purchase);
-      })
-    });
-  });
+  // var requiredMsg = 'Prerequisite not found. Cannot create purchase without campaign and user set.';
+  
+  // Campaign.findById(req.query.campaign_id, function (err, campaign) {
+  //   if (err) return handleError(res, err);
+  //   if (!campaign) return handleError(res, requiredMsg);
+  //   User.findById(req.query.user_id, function (err, user) {
+  //     if (err) return handleError(res, err);
+  //     if (!user) return handleError(res, requiredMsg);
+  //     Purchase.create(req.query, function (err, purchase) {
+  //       if (err) return handleError(res, err);
+  //       return res.json(201, purchase);
+  //     })
+  //   });
+  // });
 };
 
 // Updates an existing purchase in the DB.
@@ -47,7 +48,7 @@ exports.update = function(req, res) {
     if(err) return handleError(res, err);
     if(!purchase) return res.send(404);
     if(purchase.active) return res.send(401);// <-- when purchase has been saved with user_id it should never be updated again
-    if(req.user._id !== req.body.user_id) return res.send(400);
+    if(req.user._id != req.body.user_id) return res.send(400);
     if(req.body._id) delete req.body._id;
     req.body.active = true;
     var updated = _.merge(purchase, req.body);

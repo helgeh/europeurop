@@ -27,7 +27,7 @@ header#banner.hero-unit
         i.fa.fa-stack-2x.fa-circle
         i.fa.fa-stack-1x.fa-download.fa-inverse
 
-.container(ng-show='hasPurchases()')
+.container(ng-show='user.purchases')
   h1 Your purchases
   ul.list-group
     li.list-group-item(ng-repeat='purchase in user.purchases')

@@ -53,10 +53,9 @@ exports.validate = function (req, res) {
       var p = new Purchase({active: false});
       p.code_id = code._id;
       p.campaign = code.campaign;
-      console.log('user: ', req.user);
       if (req.user)
         p.user_id = req.user._id;
-      p.save(function (err, p) {
+      p.save(function (err, result) {
         if (err) return handleError(res, err);
         code.redeemed = true;
         code.save(function (err) {

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('europeuropApp')
-  .controller('SignupCtrl', function ($scope, Auth, $location, $window) {
+  .controller('SignupCtrl', function ($scope, Auth, $location, $window, Notify) {
     $scope.user = {};
     $scope.errors = {};
 
@@ -21,12 +21,19 @@ angular.module('europeuropApp')
       if (hasPurchase())
         values.purchase_id = Auth.getPurchase()._id;
 
+      function savePurchase () {
+        Auth.savePurchase().then(function (response) {
+          Notify.success({text: 'Success!'});
+          $scope.user = Auth.getCurrentUser();
+        });
+      }
+
       if(form.$valid) {
         Auth.createUser(values)
         .then( function() {
           // Account created, redirect to home
-          if (hasPurchase())
-            Auth.savePurchase();
+          if (hasPurchase()) 
+            savePurchase();
           $location.path('/');
         })
         .catch( function(err) {

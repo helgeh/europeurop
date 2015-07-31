@@ -3,15 +3,15 @@ div(ng-include='"components/navbar/navbar.html"')
 .container
   .row
     .col-sm-12
-      h1 Campaign
-        span(ng-if='!campaign.title') s 
-        small(ng-if='campaign.title')  {{ campaign.slug }}
+      h1 Campaigns
 
   .row
     .col-sm-3
       ul.list-group
         li.list-group-item(ng-repeat='campaign in campaigns')
-          a(href='#', ng-click="loadCampaign(campaign)") {{ campaign.title }}
+          h4
+            a(href='#', ng-click="loadCampaign(campaign)") {{ campaign.title }}
+            span.small.pull-right {{ campaign.active ? 'LIVE' : '' }}
 
     .col-sm-9
       a.btn.btn-default(ng-click='initCreate()', ng-show='showNewCampaignButton()') New Campaign
@@ -57,7 +57,8 @@ div(ng-include='"components/navbar/navbar.html"')
       
       div(ng-show='shouldShowEditForm()')
         h2 Editing {{ editedCampaign.title }}
-        form.form(name='editForm', ng-submit='updateCampaign(editedCampaign)', novalidate='')
+        form.form(name='editForm', ng-submit='updateCampaign(editedCampaign, editForm)', novalidate='')
+          div {{ editForm.$dirty ? 'DIRTY!' : 'not dirty yet...' }}
           .form-group
             label Title
             input.form-control(type='text', name='title', ng-model='editedCampaign.title', required)
@@ -80,8 +81,11 @@ div(ng-include='"components/navbar/navbar.html"')
             a.btn.btn-xs(ng-click='codesCollapsed = !codesCollapsed') {{ codesCollapsed ? 'Show' : 'Hide' }}
             ul.list-group(ng-show='editedCodes.length', collapse='codesCollapsed')
               li.list-group-item(ng-repeat='code in editedCodes')
-                | {{ code.value }}
-                span {{ code.redeemed ? 'Redeemed!' : '' }}
+                del(ng-show='code.redeemed')
+                  | {{ code.value }}
+                  span {{ code.redeemed ? 'Redeemed!' : '' }}
+                span(ng-hide='code.redeemed')
+                  | {{ code.value }}
           .form-group
             h3 Downloadables
               p
@@ -103,7 +107,7 @@ div(ng-include='"components/navbar/navbar.html"')
               | Only integers are allowed
             p.help-block {{ errors.other }}
           div
-            button.btn.btn-inverse.btn-lg.btn-login(type='submit') Update
+            button.btn.btn-inverse.btn-lg.btn-login(type='submit') {{ editForm.$dirty ? 'Update' : 'OK' }}
             = ' '
             button.btn.btn-default.btn-lg(type='reset', ng-click='abortEdit()') Cancel
             = ' '

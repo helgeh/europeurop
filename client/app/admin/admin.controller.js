@@ -32,23 +32,19 @@ angular.module('europeuropApp')
       $scope.newCampaign = null;
       $scope.newCodes = null;
       $scope.newThings = null;
-      $scope.campaign = null;
+      // $scope.createForm.$setPristine();
     }
 
     function initEdit(campaign) {
       isEditing = true;
       isCreating = false;
-      // $scope.editedCampaign = angular.copy(campaign);
-      $scope.editedCampaign = Campaigns.get({id: campaign._id}, function () {
-        Codes.query({campaign_id: campaign._id}, function (response) {
-          $scope.editedCodes = response;
-        });
-        Thing.query({campaign_id: campaign._id}, function (response) {
-          $scope.editedThings = response.map(function (item) {
-            item.link = '/api/campaigns/' + campaign._id + '/things/' + item._id + '/files/' + item.name;
-            return item;
-          });
-        });
+      // $scope.editedCampaign = Campaigns.get({id: campaign._id}, function () {
+      $scope.editedCampaign = angular.copy(campaign);
+      Codes.query({campaign_id: campaign._id}, function (response) {
+        $scope.editedCodes = response;
+      });
+      Thing.query({campaign_id: campaign._id}, function (response) {
+        $scope.editedThings = response;
       });
     }
 
@@ -57,7 +53,6 @@ angular.module('europeuropApp')
       $scope.editedCampaign = null;
       $scope.editedCodes = null;
       $scope.editedThings = null;
-      $scope.campaign = null;
     }
 
     function shouldShowCreateForm() {
@@ -130,6 +125,7 @@ angular.module('europeuropApp')
       Thing.save({campaign_id: campaign._id}, things, function (data) {
         $scope.editedThings = data;
         Notify.success({text: 'Files connected to campaign.'});
+        $scope.editedCampaign = Campaigns.get({id: campaign._id});
       }, function (err) {
         Notify.error({text: 'Error connecting things to campaign. Try again.'});
       });
@@ -141,9 +137,9 @@ angular.module('europeuropApp')
         return;
       }
       Campaigns.save(campaign, function (data) {
-          $scope.campaign = data;
+          $scope.newCampaign = data;
           var codes = $scope.newCodes.map(function (item) { return {value: item}; });
-          Codes.save({campaign_id: $scope.campaign._id}, codes, function (data) {
+          Codes.save({campaign_id: $scope.newCampaign._id}, codes, function (data) {
             Notify.success({text: 'Campaign saved!'});
             $scope.codes = data;
             $scope.campaigns = Campaigns.query();
@@ -159,7 +155,7 @@ angular.module('europeuropApp')
       );
     }
 
-    function updateCampaign(campaign) {
+    function updateCampaign(campaign, editForm) {
       if ($scope.newCodes && $scope.newCodes.length > 0) {
         // TODO: save new codes first, then update...
         // campaign.codes = $scope.newCodes;
@@ -167,6 +163,9 @@ angular.module('europeuropApp')
         $scope.newCodes = null;
         // updateCampaign(campaign);
       }
+      if (editForm.$pristine) 
+        return abortEdit();
+
       // else {
         Campaigns.save(campaign, function (data) {
           Notify.success({text: 'Campaign \"' + data.title + '\" updated!'});
@@ -204,7 +203,7 @@ angular.module('europeuropApp')
     /*----------------------------*/
 
     function loadCampaign(campaign) {
-      $scope.campaign = campaign;
+      // $scope.campaign = campaign;
       initEdit(campaign);
     }
 

@@ -18,13 +18,8 @@ angular.module('europeuropApp')
     //   })
     // }
 
-    function hasPurchases () {
-      return Auth.hasPurchase();
-    }
-    $scope.hasPurchases = hasPurchases;
-
     function showRedeemForm() {
-      return !!(!hasPurchases() || $scope.formExpanded);
+      return !!(!Auth.hasPurchase() || $scope.formExpanded);
     }
     $scope.showRedeemForm = showRedeemForm;
 
@@ -41,12 +36,12 @@ angular.module('europeuropApp')
         if (response.data.isValid) {
           Auth.setPurchase(response.data.purchase);
           if (!Auth.isLoggedIn()) {
-            next = '/login';
-            $location.path(next);
+            $location.path('/login');
           }
           else {
-            Auth.savePurchase();
-            $scope.user = Auth.getCurrentUser();
+            Auth.savePurchase().then(function (response) {
+              $scope.user = Auth.getCurrentUser();
+            });
           }
         }
         else if (response.data.captcha) {
