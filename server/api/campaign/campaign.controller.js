@@ -3,7 +3,6 @@
 var _ = require('lodash');
 var Campaign = require('./campaign.model');
 // var Code = require('../code/code.model');
-var slug = require('slug');
 
 // Get list of campaigns
 exports.index = function(req, res) {
@@ -39,9 +38,6 @@ exports.show = function(req, res) {
 
 // Creates a new campaign in the DB.
 exports.create = function(req, res) {
-  if (req.body.title) {
-    req.body.slug = slug(req.body.title);
-  }
   Campaign.create(req.body, function(err, campaign) {
     if(err) { return handleError(res, err); }
     res.json(201, campaign);
@@ -51,6 +47,9 @@ exports.create = function(req, res) {
 // Updates an existing campaign in the DB.
 exports.update = function(req, res) {
   if(req.body._id) { delete req.body._id; }
+  if (req.body.codes && req.body.codes.length > 0 && req.body.codes[0].hasOwnProperty('value')) {
+    req.body.codes = _.map(req.body.codes, function (item) { return item._id; });
+  }
   Campaign.findById(req.params.id, function (err, campaign) {
     if (err) { return handleError(res, err); }
     if(!campaign) { return res.send(404); }

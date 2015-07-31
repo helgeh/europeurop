@@ -5,8 +5,39 @@
 
 'use strict';
 
-var Thing = require('../api/thing/thing.model');
-var User = require('../api/user/user.model');
+var Thing     = require('../api/thing/thing.model');
+var User      = require('../api/user/user.model');
+var Campaign  = require('../api/campaign/campaign.model');
+var Code      = require('../api/code/code.model');
+var Purchase      = require('../api/purchase/purchase.model');
+
+Thing     .find({}).remove().exec();
+Campaign  .find({}).remove().exec();
+Code      .find({}).remove().exec();
+Purchase  .find({}).remove().exec();
+User      .find({}).remove(function() {
+  User.create({
+    provider: 'local',
+    role: 'admin',
+    name: 'Helge',
+    email: 'helge.hofstad@gmail.com',
+    password: 'ee-st4mps7v'
+  }, {
+    provider: 'local',
+    name: 'Test User',
+    email: 'test@test.com',
+    password: 'test'
+  }, {
+    provider: 'local',
+    role: 'admin',
+    name: 'Europeurop',
+    email: 'admin@europeurop.com',
+    password: 'she-gives-HEAD321'
+  }, function() {
+      console.log('finished populating users');
+    }
+  );
+});
 
 // Thing.find({}).remove(function() {
 //   Thing.create({

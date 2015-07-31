@@ -1,6 +1,7 @@
 'use strict';
 
 var User = require('./user.model');
+var Purchase = require('../purchase/purchase.model');
 var passport = require('passport');
 var config = require('../../config/environment');
 var jwt = require('jsonwebtoken');
@@ -24,14 +25,33 @@ exports.index = function(req, res) {
  * Creates a new user
  */
 exports.create = function (req, res, next) {
+  console.log(req.body);
+  if (req.body.purchase_id) {
+    var p_id = req.body.purchase_id;
+    delete(req.body.purchase_id);
+  }
   var newUser = new User(req.body);
+  var response = {};
   newUser.provider = 'local';
   newUser.role = 'user';
   newUser.save(function(err, user) {
     if (err) return validationError(res, err);
-    var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
-    res.json({ token: token });
+    if (p_id) {
+      // TODO: Make better security checks, e.g. is not active + +
+      Purchase.findOneAndUpdate({_id: p_id}, {user_id: user._id, active: true}, function (err, purchase) {
+        if(err) return res.send(500, err);
+        signToken(user);
+      });
+    }
+    else {
+      signToken(user);
+    }
   });
+  function signToken(user) {
+    var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
+    response.token = token;
+    res.json(response);
+  }
 };
 
 /**
@@ -44,6 +64,27 @@ exports.show = function (req, res, next) {
     if (err) return next(err);
     if (!user) return res.send(401);
     res.json(user.profile);
+  });
+};
+
+/**
+ * Get list of purchases owned by user
+ */
+exports.getPurchases = function(req, res) {
+  var userId = req.user._id, query;
+  if (req.user.role === 'admin') {
+    query = Purchase.find();
+    query.populate('campaign');
+  }
+  else {
+    query = Purchase.find({user_id: userId});
+    query.populate('campaign', '-codes');// <-- don't show codes to anyone other than admins
+  }
+  query.exec(function (err, purchases) {
+    if(err) return res.send(500, err);
+    // console.log(purchases);
+    if (!purchases || purchases.length < 1) return res.send(404);
+    res.json(200, purchases);
   });
 };
 
@@ -83,15 +124,24 @@ exports.changePassword = function(req, res, next) {
  * Get my info
  */
 exports.me = function(req, res, next) {
-  var userId = req.user._id;
-  User.findOne({
-    _id: userId
-  }, '-salt -hashedPassword', function(err, user) { // don't ever give out the password or salt
+  var userId = req.user._id, query;
+  query = User.findOne({_id: userId});
+  query.select('-salt -hashedPassword'); // don't ever give out the password or salt
+  query.exec(function(err, user) { 
     if (err) return next(err);
     if (!user) return res.json(401);
-    res.json(user);
+    Purchase.find({user_id: user._id}, function (err, purchases) {
+      if (purchases && purchases.length > 0) {
+        user.purchases = purchases;
+      }
+      res.json(user);
+    });
   });
 };
+
+// exports.validateEmail = function(req, res, next) {
+  
+// }
 
 /**
  * Authentication callback

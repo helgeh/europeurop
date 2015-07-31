@@ -2,7 +2,8 @@
 
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
-    Code = require('../code/code.model');
+    // Code = require('../code/code.model'),
+    slug = require('slug');
 
 var CampaignSchema = new Schema({
   title: String,
@@ -15,6 +16,14 @@ var CampaignSchema = new Schema({
 
 CampaignSchema.set('autoIndex', false);
 
+
+/**
+ * Pre-save hook
+ */
+// CampaignSchema
+//   .pre('save', function(next) {
+//     this.slug = slug(this.title);
+//   });
 
 
 module.exports = mongoose.model('Campaign', CampaignSchema);

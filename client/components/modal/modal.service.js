@@ -25,6 +25,31 @@ angular.module('europeuropApp')
     // Public API here
     return {
 
+      show: {
+        image: function (cb) {
+          cb = cb || angular.noop;
+
+          return function () {
+            var args = Array.prototype.slice.call(arguments),
+                img = args.shift(),
+                defaults = {title: 'Image Title', src: '/dummy.jpg', alt: 'Dummy alt'},
+                imageModal;
+            img = angular.extend(defaults, img);
+
+            imageModal = openModal({
+              modal: {
+                dismissable: true,
+                title: img.title,
+                html: '<img svartefaen src=\'' + img.src + '\' alt=\'' + img.alt + '\'  style="width: 100%;" >'
+              }
+            });
+            imageModal.result.then(function(event) {
+              cb.apply(event, args);
+            });
+          }
+        }
+      },
+
       /* Confirmation modals */
       confirm: {
 

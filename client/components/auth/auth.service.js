@@ -1,11 +1,15 @@
 'use strict';
 
 angular.module('europeuropApp')
-  .factory('Auth', function Auth($location, $rootScope, $http, User, $cookieStore, $q) {
+  .factory('Auth', function Auth($location, $rootScope, $http, $cookieStore, $q, User) {
     var currentUser = {};
-    var currentCode = {};
+    var currentPurchase = {};
     if($cookieStore.get('token')) {
-      currentUser = User.get();
+      currentUser = User.get(function () {
+        currentUser.purchases = User.getPurchases({ id: currentUser._id }); //, function (result) {
+        //   currentUser.purchases = result;
+        // });
+      });
     }
 
     return {
@@ -145,17 +149,75 @@ angular.module('europeuropApp')
       },
 
       /**
-       * Get redeemed code
+       * Check if user has a new purchase
        */
-      getCode: function () {
-        return currentCode;
+      hasPurchase: function () {
+        return currentPurchase.hasOwnProperty('_id') || currentUser.purchases;
       },
 
       /**
-       * Set redeemed code for later 
+       * Get Purchase
        */
-      setCode: function (code) {
-        currentCode = code;
+      getPurchase: function () {
+        return currentPurchase;
+      },
+
+      /**
+       * Set Purchase
+       */
+      setPurchase: function (purchase) {
+        currentPurchase = purchase;
+      },
+
+      /**
+       * If user is logged in save current purchase to current user
+       */
+      savePurchase: function () {
+        var deferred = $q.defer();
+        var msg;
+        if (!currentPurchase._id) msg = 'No purchase to save!';
+        if (currentPurchase.user_id) msg = 'Purchase allready saved!';
+        if (msg) {
+          Notify.error({text: msg});
+          deferred.reject();
+          return deferred.promise;
+        }
+        this.isLoggedInAsync(function (loggedIn) {
+          if (loggedIn) {
+            currentPurchase.user_id = currentUser._id;
+            $http.put('/api/purchases/' + currentPurchase._id, currentPurchase).success(function (data) {
+              Notify.success({text: 'Purchase added to your account!'});
+              deferred.resolve(data);
+            }).error(function (data) {
+              Notify.error({text: 'Even if you are logged in we could not add the purchase to your account. Please contact administrators!'});
+              deferred.reject(err);
+            });
+          }
+          else 
+            Notify.error({text: 'Could not save the purchase'});
+        });
+        // else if (!this.isLoggedIn()) {
+        //   Notify.error({text: 'Could not save your code, not logged in yet'});
+        //   deferred.reject();
+        // }
+        // else {
+        //   currentPurchase.user_id = currentUser._id;
+        //   $http.put('/api/purchases/' + currentPurchase._id, currentPurchase).success(function (data) {
+        //     Notify.success({text: 'Purchase added to your account!'});
+        //     deferred.resolve(data);
+        //   }).error(function (data) {
+        //     Notify.error({text: 'Even if you are logged in we could not add the purchase to your account. Please contact administrators!'});
+        //     deferred.reject(err);
+        //   });
+        // }
+        return deferred.promise;
+      },
+
+      /**
+       * Get All Purchases
+       */
+      getAllPurchases: function () {
+        return currentUser.purchases;
       }
     };
   });

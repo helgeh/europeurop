@@ -5,6 +5,11 @@ angular.module('europeuropApp')
     $scope.user = {};
     $scope.errors = {};
 
+    function hasPurchase () {
+      return Auth.hasPurchase();
+    }
+    $scope.hasPurchase = hasPurchase;
+
     $scope.login = function(form) {
       $scope.submitted = true;
 
@@ -15,6 +20,8 @@ angular.module('europeuropApp')
         })
         .then( function() {
           // Logged in, redirect to home
+          if (hasPurchase())
+            Auth.savePurchase();
           $location.path('/');
         })
         .catch( function(err) {

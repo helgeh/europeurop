@@ -77,8 +77,7 @@ angular.module('europeuropApp')
             if (!$files)
               return;
             modalScope.files = $files;
-            var uploads = [],
-              directory = currentCampaign.slug;
+            var uploads = [];
             for (var i = 0; i < $files.length; i++) {
               file = $files[i];
               file.progress = parseInt(0);

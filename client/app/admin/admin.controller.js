@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('europeuropApp')
-  .controller('AdminCtrl', function ($scope, $http, Auth, Campaigns, Codes, Things, User, UploadModal, Notify) {
-    
+  .controller('AdminCtrl', function ($scope, $http, $window, Auth, Campaigns, Codes, Thing, User, Modal, UploadModal) {
+
 
     /*----------------------------*/
     /*   GENERAL                  */
@@ -13,6 +13,11 @@ angular.module('europeuropApp')
       campaign,
       codes,
       things;
+
+    var showImage = Modal.show.image(function (test) { console.log(test); });
+    $scope.codesCollapsed = true;
+    $scope.thingsCollapsed = true;
+
 
     function initCreate() {
       $scope.newCampaign = {};
@@ -27,25 +32,19 @@ angular.module('europeuropApp')
       $scope.newCampaign = null;
       $scope.newCodes = null;
       $scope.newThings = null;
-      $scope.campaign = null;
+      // $scope.createForm.$setPristine();
     }
 
     function initEdit(campaign) {
       isEditing = true;
       isCreating = false;
+      // $scope.editedCampaign = Campaigns.get({id: campaign._id}, function () {
       $scope.editedCampaign = angular.copy(campaign);
       Codes.query({campaign_id: campaign._id}, function (response) {
         $scope.editedCodes = response;
       });
-      Things.query({campaign_id: campaign._id}, function (response) {
-        console.log(response);
-        $scope.editedThings = response.map(function (item) {
-          // console.log("link: " + item.link);
-          item.link = '/api/campaigns/' + campaign._id + '/things/' + item._id + '/files/' + item.name;
-          console.log("edit: " + item.link);
-          return item;
-        });
-        // $scope.editedThings = response;
+      Thing.query({campaign_id: campaign._id}, function (response) {
+        $scope.editedThings = response;
       });
     }
 
@@ -54,7 +53,6 @@ angular.module('europeuropApp')
       $scope.editedCampaign = null;
       $scope.editedCodes = null;
       $scope.editedThings = null;
-      $scope.campaign = null;
     }
 
     function shouldShowCreateForm() {
@@ -124,9 +122,10 @@ angular.module('europeuropApp')
         name = upload.key.substr(upload.key.lastIndexOf('/') + 1);
         things.push({s3Object: upload, name: name});
       }
-      Things.save({campaign_id: campaign._id}, things, function (data) {
+      Thing.save({campaign_id: campaign._id}, things, function (data) {
         $scope.editedThings = data;
         Notify.success({text: 'Files connected to campaign.'});
+        $scope.editedCampaign = Campaigns.get({id: campaign._id});
       }, function (err) {
         Notify.error({text: 'Error connecting things to campaign. Try again.'});
       });
@@ -138,9 +137,9 @@ angular.module('europeuropApp')
         return;
       }
       Campaigns.save(campaign, function (data) {
-          $scope.campaign = data;
+          $scope.newCampaign = data;
           var codes = $scope.newCodes.map(function (item) { return {value: item}; });
-          Codes.save({campaign_id: $scope.campaign._id}, codes, function (data) {
+          Codes.save({campaign_id: $scope.newCampaign._id}, codes, function (data) {
             Notify.success({text: 'Campaign saved!'});
             $scope.codes = data;
             $scope.campaigns = Campaigns.query();
@@ -156,13 +155,18 @@ angular.module('europeuropApp')
       );
     }
 
-    function updateCampaign(campaign) {
+    function updateCampaign(campaign, editForm) {
       if ($scope.newCodes && $scope.newCodes.length > 0) {
         // TODO: save new codes first, then update...
+        // campaign.codes = $scope.newCodes;
+        console.log(campaign.codes);
         $scope.newCodes = null;
-        updateCampaign(campaign);
+        // updateCampaign(campaign);
       }
-      else {
+      if (editForm.$pristine) 
+        return abortEdit();
+
+      // else {
         Campaigns.save(campaign, function (data) {
           Notify.success({text: 'Campaign \"' + data.title + '\" updated!'});
           abortEdit();
@@ -170,7 +174,16 @@ angular.module('europeuropApp')
         }, function (err) {
           Notify.error({text: 'Could not update right now. Try again.'});
         });
-      }
+      // }
+    }
+
+    function deleteCampaign (campaign) {
+      Campaigns.remove({id: campaign._id});
+      angular.forEach($scope.campaigns, function (c, i) {
+        if (c._id == campaign._id)
+          $scope.campaigns.splice(i, 1);
+      });
+      abortEdit();
     }
 
     // PUBLIC METHODS
@@ -179,6 +192,7 @@ angular.module('europeuropApp')
     $scope.addFiles = addFiles;
     $scope.createCampaign = createCampaign;
     $scope.updateCampaign = updateCampaign;
+    $scope.deleteCampaign = deleteCampaign;
 
 
 
@@ -189,7 +203,7 @@ angular.module('europeuropApp')
     /*----------------------------*/
 
     function loadCampaign(campaign) {
-      $scope.campaign = campaign;
+      // $scope.campaign = campaign;
       initEdit(campaign);
     }
 
@@ -206,27 +220,28 @@ angular.module('europeuropApp')
       });
     }
 
-    function openFile (thing) {
-      downloadFile(thing, true);
-    }
-
-    function downloadFile (thing, open) {
-      $http.get(thing.link + (open ? '' : '?download')).success(function (data) {
+    function openFile (campaign, thing) {
+      Thing.download({campaign_id: campaign._id, thing_id: thing._id}, function (data) {
         if (data.policy) {
-          if (open)
-            $window.open(data.policy);
-          else
-            $("body").append("<iframe src='" + data.policy+ "' style='display: none;' ></iframe>");
+          showImage({title: thing.name, src: data.policy});
         }
-      }).error(function (data) {
-        console.log('err');
-        console.log(arguments);
       });
     }
+
+    function downloadFile (campaign, thing) {
+      console.log(thing);
+      Thing.download({campaign_id: campaign._id, thing_id: thing._id, download: 'download'}, function (data) {
+        if (data.policy) {
+          $("body").append("<iframe src='" + data.policy+ "' style='display: none;' ></iframe>");
+        }
+      });
+    }
+
 
     // PUBLIC METHODS
     $scope.loadCampaign = loadCampaign;
     $scope.deleteUser = deleteUser;
+    $scope.openFile = openFile;
     $scope.downloadFile = downloadFile;
 
     // PUBLIC PROPERTIES

@@ -1,7 +1,9 @@
 div(ng-include='"components/navbar/navbar.html"')
 
 header#banner.hero-unit
-  .container
+  a.pull-right(href='#', btn-checkbox, ng-model='formExpanded')
+    i.glyphicon.ng-scope.glyphicon-chevron-right(ng-class="{'glyphicon-chevron-down': formExpanded, 'glyphicon-chevron-right': !formExpanded}")
+  .container(ng-show='showRedeemForm()')
     h1 Insert secret code
     p.lead ...and recieve downloads
     form(role='form', name='urlForm', ng-submit='submit()')
@@ -24,6 +26,12 @@ header#banner.hero-unit
       span.fa-stack.fa-3x
         i.fa.fa-stack-2x.fa-circle
         i.fa.fa-stack-1x.fa-download.fa-inverse
+
+.container(ng-show='user.purchases')
+  h1 Your purchases
+  ul.list-group
+    li.list-group-item(ng-repeat='purchase in user.purchases')
+      purchase(campaign='purchase.campaign')
 
 footer.footer
   .container
