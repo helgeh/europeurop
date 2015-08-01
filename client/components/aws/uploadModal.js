@@ -97,7 +97,8 @@ angular.module('europeuropApp')
               text: 'OK',
               click: function(e) {
                 if (imageUploads.length > 0) {
-                  result.imageUploads = imageUploads;
+                  result.imageUploads = angular.copy(imageUploads);
+                  imageUploads = [];
                   result.status = 'OK';
                 }
                 uploadModal.close(e);
@@ -107,6 +108,7 @@ angular.module('europeuropApp')
               text: 'Cancel',
               click: function(e) {
                 result.imageUploads = [];
+                imageUploads = [];
                 result.status = 'Canceled';
                 uploadModal.dismiss(e);
               }

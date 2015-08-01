@@ -123,7 +123,7 @@ angular.module('europeuropApp')
         things.push({s3Object: upload, name: name});
       }
       Thing.save({campaign_id: campaign._id}, things, function (data) {
-        $scope.editedThings = data;
+        $scope.editedThings = $scope.editedThings.concat(data);
         Notify.success({text: 'Files connected to campaign.'});
         $scope.editedCampaign = Campaigns.get({id: campaign._id});
       }, function (err) {

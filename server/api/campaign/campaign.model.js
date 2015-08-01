@@ -20,10 +20,12 @@ CampaignSchema.set('autoIndex', false);
 /**
  * Pre-save hook
  */
-// CampaignSchema
-//   .pre('save', function(next) {
-//     this.slug = slug(this.title);
-//   });
+CampaignSchema
+  .pre('save', function(next) {
+    if (!this.isNew) return next();
+    this.slug = slug(this.title).toLowerCase();
+    next();
+  });
 
 
 module.exports = mongoose.model('Campaign', CampaignSchema);
