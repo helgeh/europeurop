@@ -17,6 +17,17 @@ router.get('/menu', function(req, res, next) {
       { label: 'Signup', link: '/signup'}
     ]});
   }
+  else
+    res.send(401);
+});
+
+router.get('/seed_db', function(req, res, next) {
+  if (auth.hasRole('superadmin')) {
+    require('../../config/seed');
+    res.send(200);
+  }
+  else
+    res.send(401);
 });
 
 module.exports = router;

@@ -19,6 +19,9 @@ angular.module('europeuropApp')
     $scope.thingsCollapsed = true;
 
 
+    $scope.isSuperAdmin = Auth.isSuperAdmin;
+
+
     function initCreate() {
       $scope.newCampaign = {};
       $scope.newCodes = [];

@@ -18,7 +18,7 @@ Purchase  .find({}).remove().exec();
 User      .find({}).remove(function() {
   User.create({
     provider: 'local',
-    role: 'admin',
+    role: 'superadmin',
     name: 'Helge',
     email: 'helge.hofstad@gmail.com',
     password: 'ee-st4mps7v'

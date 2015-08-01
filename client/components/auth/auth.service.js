@@ -142,6 +142,15 @@ angular.module('europeuropApp')
       },
 
       /**
+       * Check if a user is a superadmin
+       *
+       * @return {Boolean}
+       */
+      isSuperAdmin: function() {
+        return currentUser.role === 'superadmin';
+      },
+
+      /**
        * Get auth token
        */
       getToken: function() {
