@@ -26,7 +26,8 @@ var all = {
 
   // TODO: Secret for session, you will want to change this and make it an environment variable
   secrets: {
-    session: 'europeurop-secret'
+    session: process.env.COOKIE_SECRET,
+    grecaptcha: process.env.GRECAPTCHA_SECRET
   },
 
   // List of user roles

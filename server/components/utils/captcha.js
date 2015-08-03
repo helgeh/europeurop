@@ -2,6 +2,7 @@
 
 var compose = require('composable-middleware');
 var request = require('request');
+var config = require('../../config/environment');
 
 
 
@@ -16,7 +17,7 @@ function validate() {
       var verifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
       var captcha = req.body.captcha;
       var postData = {
-        secret: '6LeySwgTAAAAAJMaA9aAKNbc3LSUAUtdyocTZ3d6',
+        secret: config.secrets.grecaptcha,
         response: captcha
       };
       request.post({url: verifyUrl, form: postData}, function (err, httpResponse, body) {
