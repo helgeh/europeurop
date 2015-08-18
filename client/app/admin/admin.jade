@@ -81,8 +81,7 @@ div(ng-include='"components/navbar/navbar.html"')
             ul.list-group(ng-show='editedCodes.length', collapse='codesCollapsed')
               li.list-group-item(ng-repeat='code in editedCodes')
                 del(ng-show='code.redeemed')
-                  | {{ code.value }}
-                  span {{ code.redeemed ? 'Redeemed!' : '' }}
+                  | {{ code.value }} Redeemed
                 span(ng-hide='code.redeemed')
                   | {{ code.value }}
           .form-group
