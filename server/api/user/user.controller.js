@@ -5,6 +5,7 @@ var Purchase = require('../purchase/purchase.model');
 var passport = require('passport');
 var config = require('../../config/environment');
 var jwt = require('jsonwebtoken');
+var auth = require('../../auth/auth.service');
 
 var validationError = function(res, err) {
   return res.json(422, err);
@@ -31,7 +32,6 @@ exports.create = function (req, res, next) {
     delete(req.body.purchase_id);
   }
   var newUser = new User(req.body);
-  var response = {};
   newUser.provider = 'local';
   newUser.role = 'user';
   newUser.save(function(err, user) {
@@ -40,18 +40,13 @@ exports.create = function (req, res, next) {
       // TODO: Make better security checks, e.g. is not active + +
       Purchase.findOneAndUpdate({_id: p_id}, {user_id: user._id, active: true}, function (err, purchase) {
         if(err) return res.send(500, err);
-        signToken(user);
+        res.json({token: auth.signToken(user._id, user.role)});
       });
     }
     else {
-      signToken(user);
+      res.json({token: auth.signToken(user._id, user.role)});
     }
   });
-  function signToken(user) {
-    var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
-    response.token = token;
-    res.json(response);
-  }
 };
 
 /**
