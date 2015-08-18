@@ -6,7 +6,7 @@ angular.module('europeuropApp')
     $scope.dev = {menu: []};
     $http.get('/dev/menu').then(function (response) {
       $scope.dev = response.data;
-      $scope.isDev = true;
+      $scope.isDev = !!(response.data.menu && response.data.menu.length);
     });
     $scope.isActive = function(route) {
       return route === $location.path();
