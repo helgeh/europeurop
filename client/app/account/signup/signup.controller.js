@@ -18,12 +18,9 @@ angular.module('europeuropApp')
           email: $scope.user.email,
           password: $scope.user.password
         };
-      if (hasPurchase())
-        values.purchase_id = Auth.getPurchase()._id;
 
       function savePurchase () {
         Auth.savePurchase().then(function (response) {
-          Notify.success({text: 'Success!'});
           $scope.user = Auth.getCurrentUser();
         });
       }
@@ -32,7 +29,8 @@ angular.module('europeuropApp')
         Auth.createUser(values)
         .then( function() {
           // Account created, redirect to home
-          if (hasPurchase()) 
+          Notify.success({text: 'Account created'});
+          if (hasPurchase())
             savePurchase();
           $location.path('/');
         })

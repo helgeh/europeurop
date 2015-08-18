@@ -26,26 +26,12 @@ exports.index = function(req, res) {
  * Creates a new user
  */
 exports.create = function (req, res, next) {
-  console.log(req.body);
-  if (req.body.purchase_id) {
-    var p_id = req.body.purchase_id;
-    delete(req.body.purchase_id);
-  }
   var newUser = new User(req.body);
   newUser.provider = 'local';
   newUser.role = 'user';
   newUser.save(function(err, user) {
     if (err) return validationError(res, err);
-    if (p_id) {
-      // TODO: Make better security checks, e.g. is not active + +
-      Purchase.findOneAndUpdate({_id: p_id}, {user_id: user._id, active: true}, function (err, purchase) {
-        if(err) return res.send(500, err);
-        res.json({token: auth.signToken(user._id, user.role)});
-      });
-    }
-    else {
-      res.json({token: auth.signToken(user._id, user.role)});
-    }
+    res.json({token: auth.signToken(user._id, user.role)});
   });
 };
 
@@ -122,7 +108,7 @@ exports.me = function(req, res, next) {
   var userId = req.user._id, query;
   query = User.findOne({_id: userId});
   query.select('-salt -hashedPassword'); // don't ever give out the password or salt
-  query.exec(function(err, user) { 
+  query.exec(function(err, user) {
     if (err) return next(err);
     if (!user) return res.json(401);
     Purchase.find({user_id: user._id}, function (err, purchases) {
@@ -135,7 +121,7 @@ exports.me = function(req, res, next) {
 };
 
 // exports.validateEmail = function(req, res, next) {
-  
+
 // }
 
 /**
