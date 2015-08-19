@@ -43,6 +43,7 @@ module.exports = function(app) {
   }
 
   if ('development' === env || 'test' === env) {
+    app.use(helmet.hsts({ maxAge: 0 }));
     app.use(require('connect-livereload')());
     app.use(express.static(path.join(config.root, '.tmp')));
     app.use(express.static(path.join(config.root, 'client')));
