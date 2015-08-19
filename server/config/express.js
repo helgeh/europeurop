@@ -29,15 +29,14 @@ module.exports = function(app) {
   app.use(cookieParser());
   app.use(passport.initialize());
 
-  var ninetyDaysInMilliseconds = 7776000000;
-  app.use(helmet.hsts({ maxAge: ninetyDaysInMilliseconds }));
-  app.use(helmet.hidePoweredBy());
-
   if ('production' === env) {
     app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
     app.use(express.static(path.join(config.root, 'public')));
     app.set('appPath', config.root + '/public');
     app.use(morgan('dev'));
+    var ninetyDaysInMilliseconds = 7776000000;
+    app.use(helmet.hsts({ maxAge: ninetyDaysInMilliseconds }));
+    app.use(helmet.hidePoweredBy());
   }
 
   if ('development' === env || 'test' === env) {
