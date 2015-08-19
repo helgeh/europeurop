@@ -15,6 +15,7 @@ var errorHandler = require('errorhandler');
 var path = require('path');
 var config = require('./environment');
 var passport = require('passport');
+var helmet = require('helmet');
 
 module.exports = function(app) {
   var env = app.get('env');
@@ -27,6 +28,11 @@ module.exports = function(app) {
   app.use(methodOverride());
   app.use(cookieParser());
   app.use(passport.initialize());
+
+  var ninetyDaysInMilliseconds = 7776000000;
+  app.use(helmet.hsts({ maxAge: ninetyDaysInMilliseconds }));
+  app.use(helmet.hidePoweredBy());
+
   if ('production' === env) {
     app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
     app.use(express.static(path.join(config.root, 'public')));
