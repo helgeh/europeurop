@@ -16,6 +16,7 @@ var path = require('path');
 var config = require('./environment');
 var passport = require('passport');
 var helmet = require('helmet');
+var express_enforces_ssl = require('express-enforces-ssl');
 
 module.exports = function(app) {
   var env = app.get('env');
@@ -37,6 +38,8 @@ module.exports = function(app) {
     var ninetyDaysInMilliseconds = 7776000000;
     app.use(helmet.hsts({ maxAge: ninetyDaysInMilliseconds }));
     app.use(helmet.hidePoweredBy());
+    app.enable('trust proxy');
+    app.use(express_enforces_ssl());
   }
 
   if ('development' === env || 'test' === env) {
