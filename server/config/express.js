@@ -35,8 +35,8 @@ module.exports = function(app) {
     app.use(express.static(path.join(config.root, 'public')));
     app.set('appPath', config.root + '/public');
     app.use(morgan('dev'));
-    var ninetyDaysInMilliseconds = 7776000000;
-    app.use(helmet.hsts({ maxAge: ninetyDaysInMilliseconds }));
+    var eighteenWeeks = 10886400000;
+    app.use(helmet.hsts({ maxAge: eighteenWeeks }));
     app.use(helmet.hidePoweredBy());
     app.enable('trust proxy');
     app.use(express_enforces_ssl());
