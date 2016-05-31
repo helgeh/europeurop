@@ -6,11 +6,17 @@
 // You will need to set these on the server you deploy to.
 
 module.exports = {
-  DOMAIN:           'http://localhost:9000',
-  SESSION_SECRET:   'europeurop-secret',
+  DOMAIN: 'http://localhost:9000',
 
-  GOOGLE_ID:        'app-id',
-  GOOGLE_SECRET:    'secret',
+  GOOGLE_ID: 'app-id',
+  GOOGLE_SECRET: 'secret',
+
+  AWS_ID: 'app-id',
+  AWS_SECRET: 'secret',
+
+  GRECAPTCHA_SECRET: 'secret',
+
+  COOKIE_SECRET: 'secret',
 
   // Control debug level for modules using visionmedia/debug
   DEBUG: ''

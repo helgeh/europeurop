@@ -9,6 +9,10 @@ angular.module('europeuropApp')
         })
     }
 
+    function sanitize(str) {
+      return str.replace(/å/gi, 'a').replace(/æ/gi, 'ae').replace(/ø/gi, 'o').replace(/[^a-z0-9_\.\-]/gi, '_');
+    }
+
     this.uploadFile = function(path, file) {
        return $http.get('/aws/s3Policy/' + file.name + '/write').then(function (response) {
             var s3Params = response.data;
@@ -30,7 +34,7 @@ angular.module('europeuropApp')
                     }
                 },
                 data: {
-                    'key' : path + '${filename}', //''+ Math.round(Math.random()*10000) + '$$' + file.name,
+                    'key' : path + sanitize(file.name), // '${filename}', //''+ Math.round(Math.random()*10000) + '$$' + file.name,
                     'acl' : s3Params.acl,
                     'Content-Type' : s3Params.mime,
                     'AWSAccessKeyId': s3Params.s3Key,

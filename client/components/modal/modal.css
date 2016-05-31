@@ -21,3 +21,8 @@
 .modal-danger .modal-header {
   background: #d9534f;
 }
+
+
+.modal-content img {
+  width: 100%;
+}

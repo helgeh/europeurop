@@ -1,18 +1,22 @@
 div(ng-include='"components/navbar/navbar.html"')
 
 header#banner.hero-unit
-  .container
+  a.pull-right(href='#', btn-checkbox, ng-model='formExpanded')
+    i.glyphicon.ng-scope.glyphicon-chevron-right(ng-class="{'glyphicon-chevron-down': formExpanded, 'glyphicon-chevron-right': !formExpanded}")
+  .container(ng-show='showRedeemForm()')
     h1 Insert secret code
     p.lead ...and recieve downloads
-    form.input-group.input-group-lg(name='urlForm')
-      input.form-control(type='text', placeholder='secret', ng-model='secretInput', required)
-      span.input-group-btn
-        button.btn.btn-default(ng-click='validate(secretInput)') GO!
+    form(role='form', name='urlForm', ng-submit='submit()')
+      div.input-group.input-group-lg
+        input.form-control(type='text', placeholder='secret', ng-model='secretInput', required)
+        span.input-group-btn
+          button.btn.btn-default() GO!
+      div(grecaptcha, ng-model='captcha')
     p.download-icons
       span.fa-stack.fa-3x
         i.fa.fa-stack-2x.fa-circle
         i.fa.fa-stack-1x.fa-unlock-alt.fa-inverse
-      span.fa-stack.fa-3x 
+      span.fa-stack.fa-3x
         i.fa.fa-stack-1x.fa-caret-right
       span.fa-stack.fa-3x
         i.fa.fa-stack-2x.fa-circle
@@ -23,10 +27,15 @@ header#banner.hero-unit
         i.fa.fa-stack-2x.fa-circle
         i.fa.fa-stack-1x.fa-download.fa-inverse
 
+.container(ng-show='user.purchases')
+  h1 Your purchases
+  ul.list-group
+    li.list-group-item(ng-repeat='purchase in user.purchases')
+      purchase(campaign='purchase.campaign')
+
 footer.footer
   .container
     p
-      | 
       a(href='https://europeurop.com/') Europeurop
       = ' | '
       year

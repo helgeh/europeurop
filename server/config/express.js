@@ -15,6 +15,8 @@ var errorHandler = require('errorhandler');
 var path = require('path');
 var config = require('./environment');
 var passport = require('passport');
+var helmet = require('helmet');
+var express_enforces_ssl = require('express-enforces-ssl');
 
 module.exports = function(app) {
   var env = app.get('env');
@@ -27,14 +29,21 @@ module.exports = function(app) {
   app.use(methodOverride());
   app.use(cookieParser());
   app.use(passport.initialize());
+
   if ('production' === env) {
     app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
     app.use(express.static(path.join(config.root, 'public')));
     app.set('appPath', config.root + '/public');
     app.use(morgan('dev'));
+    var eighteenWeeks = 10886400000;
+    app.use(helmet.hsts({ maxAge: eighteenWeeks }));
+    app.use(helmet.hidePoweredBy());
+    app.enable('trust proxy');
+    app.use(express_enforces_ssl());
   }
 
   if ('development' === env || 'test' === env) {
+    app.use(helmet.hsts({ maxAge: 0 }));
     app.use(require('connect-livereload')());
     app.use(express.static(path.join(config.root, '.tmp')));
     app.use(express.static(path.join(config.root, 'client')));

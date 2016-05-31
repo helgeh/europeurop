@@ -6,6 +6,13 @@ angular.module('europeuropApp')
       id: '@_id'
     },
     {
+      getPurchases: {
+        method: 'GET',
+        isArray: true,
+        params: {
+          controller: 'purchases'
+        }
+      },
       changePassword: {
         method: 'PUT',
         params: {

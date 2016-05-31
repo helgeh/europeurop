@@ -6,9 +6,10 @@ angular.module('europeuropApp', [
   'ngSanitize',
   'ngRoute',
   'ui.bootstrap',
-  'ngFileUpload'
+  'ngFileUpload',
+  'grecaptcha'
 ])
-  .config(function ($routeProvider, $locationProvider, $httpProvider) {
+  .config(function ($routeProvider, $locationProvider, $httpProvider, grecaptchaProvider) {
     $routeProvider
       .otherwise({
         redirectTo: '/'
@@ -16,6 +17,10 @@ angular.module('europeuropApp', [
 
     $locationProvider.html5Mode(true);
     $httpProvider.interceptors.push('authInterceptor');
+    grecaptchaProvider.setParameters({
+      sitekey: '6LeySwgTAAAAAEnT9nG-9vgUYXHGdM13yHJcuDoE',
+      theme: 'dark'
+    });
   })
 
   .factory('authInterceptor', function ($rootScope, $q, $cookieStore, $location) {
@@ -44,7 +49,8 @@ angular.module('europeuropApp', [
     };
   })
 
-  .run(function ($rootScope, $location, $http, Auth) {
+  .run(function ($rootScope, $location, $http, Auth, Notify) {
+    window.Notify = Notify;
     // Redirect to login if route requires auth and you're not logged in
     $rootScope.$on('$routeChangeStart', function (event, next) {
       var path = $location.path();

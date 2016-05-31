@@ -3,6 +3,7 @@ div(ng-include='"components/navbar/navbar.html"')
   .row
     .col-sm-12
       h1 Sign up
+        small(ng-show='hasPurchase()') ...to get yer downloads
     .col-sm-12
       form.form(name='form', ng-submit='register(form)', novalidate='')
         .form-group(ng-class='{ "has-success": form.name.$valid && submitted,\

@@ -22,12 +22,20 @@
     background: #4393B9;
 }
 
+/*.hero-unit .list-group-item {
+    color: #aaa;
+}*/
+
 .hero-unit .download-icons {
     margin-top: 20px;
 }
 
 .hero-unit .fa-inverse {
     color: #99CDE6;
+}
+
+.hero-unit a[btn-checkbox] {
+    color: white;
 }
 
 .footer {

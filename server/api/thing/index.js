@@ -6,7 +6,7 @@ var auth = require('../../auth/auth.service');
 
 var router = express.Router({mergeParams: true});
 
-router.get('/', controller.index);
+router.get('/', auth.isAuthenticated(), controller.index);
 router.get('/:id', auth.hasRole('admin'), controller.show);
 
 router.post('/', auth.hasRole('admin'), controller.create);
@@ -14,6 +14,6 @@ router.post('/', auth.hasRole('admin'), controller.create);
 // router.patch('/:id', controller.update);
 router.delete('/:id', auth.hasRole('admin'), controller.destroy);
 
-router.get('/:id/files/:file', auth.isAuthenticated(), controller.download);
+router.get('/:id/file', auth.isAuthenticated(), controller.download);
 
 module.exports = router;

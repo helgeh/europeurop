@@ -1,21 +1,37 @@
 'use strict';
 
 angular.module('europeuropApp')
-  .controller('SignupCtrl', function ($scope, Auth, $location, $window) {
+  .controller('SignupCtrl', function ($scope, Auth, $location, $window, Notify) {
     $scope.user = {};
     $scope.errors = {};
+
+    function hasPurchase () {
+      return Auth.hasPurchase();
+    }
+    $scope.hasPurchase = hasPurchase;
 
     $scope.register = function(form) {
       $scope.submitted = true;
 
-      if(form.$valid) {
-        Auth.createUser({
+      var values = {
           name: $scope.user.name,
           email: $scope.user.email,
           password: $scope.user.password
-        })
+        };
+
+      function savePurchase () {
+        Auth.savePurchase().then(function (response) {
+          $scope.user = Auth.getCurrentUser();
+        });
+      }
+
+      if(form.$valid) {
+        Auth.createUser(values)
         .then( function() {
           // Account created, redirect to home
+          Notify.success({text: 'Account created'});
+          if (hasPurchase())
+            savePurchase();
           $location.path('/');
         })
         .catch( function(err) {

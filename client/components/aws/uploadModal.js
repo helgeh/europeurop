@@ -72,11 +72,12 @@ angular.module('europeuropApp')
 
         uploadModal = openModal({
           onFileSelect: function ($files) {
-            // if (!$files)
-            //   return;
+            // TODO: don't know why this gets called before files select window is even opened.
+            // Fix ugly workaround later
+            if (!$files)
+              return;
             modalScope.files = $files;
-            var uploads = [],
-              directory = currentCampaign.slug;
+            var uploads = [];
             for (var i = 0; i < $files.length; i++) {
               file = $files[i];
               file.progress = parseInt(0);
@@ -96,7 +97,8 @@ angular.module('europeuropApp')
               text: 'OK',
               click: function(e) {
                 if (imageUploads.length > 0) {
-                  result.imageUploads = imageUploads;
+                  result.imageUploads = angular.copy(imageUploads);
+                  imageUploads = [];
                   result.status = 'OK';
                 }
                 uploadModal.close(e);
@@ -106,6 +108,7 @@ angular.module('europeuropApp')
               text: 'Cancel',
               click: function(e) {
                 result.imageUploads = [];
+                imageUploads = [];
                 result.status = 'Canceled';
                 uploadModal.dismiss(e);
               }

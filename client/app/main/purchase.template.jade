@@ -1,0 +1,10 @@
+h2 {{ campaign.title }}:
+ul.list-group
+  li.list-group-item(ng-repeat='thing in things')
+    | {{ thing.name }}
+    = ' '
+    a(href='#', ng-click='openFile(thing)') 
+      | open
+    = ' '
+    a(href='#', ng-click='downloadFile(thing)') 
+      | dl 
