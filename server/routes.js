@@ -8,6 +8,10 @@ var errors = require('./components/errors');
 
 module.exports = function(app) {
 
+  // Redirect all http traffic
+  var forceSSL = require('./components/utils/forcessl')(app);
+  app.get('*', forceSSL);
+
   // Insert routes below
   app.use('/api/purchases', require('./api/purchase'));
   app.use('/api/campaigns', require('./api/campaign'));
