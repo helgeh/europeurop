@@ -30,6 +30,13 @@ module.exports = function(app) {
   app.route('/:url(api|auth|components|app|bower_components|assets)/*')
    .get(errors[404]);
 
+  // Handle unauthorized error from express-jwt
+  app.use(function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {
+      res.status(401).send('invalid token...');
+    }
+  });
+
   // All other routes should redirect to the index.html
   app.route('/*')
     .get(function(req, res) {
